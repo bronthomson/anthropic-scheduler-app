@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 import os
+import json
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+import unicodedata
 
 # Set up Google Sheets credentials and client
-creds = Credentials.from_service_account_file('/Users/bron/Documents/Maramataka-slack-automation/brons-test-project-18f917064051.json')
+creds_json = os.environ.get('GOOGLE_CREDENTIALS')
+creds_dict = json.loads(creds_json)
+creds = Credentials.from_service_account_info(creds_dict)
 sheets_service = build('sheets', 'v4', credentials=creds)
 
 # Set up Slack client
@@ -15,8 +19,8 @@ if not slack_token:
     raise ValueError("SLACK_BOT_TOKEN environment variable is not set")
 slack_client = WebClient(token=slack_token)
 
-SHEET_ID = '1QNyDuoFid_Nf03ROd8oJdr-oD3tshIJjWTFWtdQjO50'
-CHANNEL_ID = 'C070SDFNL3C'
+SHEET_ID = os.environ.get('SHEET_ID')
+CHANNEL_ID = os.environ.get('CHANNEL_ID')
 
 def get_last_slack_message():
     try:
@@ -26,8 +30,6 @@ def get_last_slack_message():
     except SlackApiError as e:
         print(f"Error fetching last message: {e}")
         return None
-
-import unicodedata
 
 def strip_accents(text):
     return ''.join(char for char in
