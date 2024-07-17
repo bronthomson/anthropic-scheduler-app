@@ -2,6 +2,7 @@
 import os
 import json
 from datetime import datetime, timedelta
+import pytz
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from slack_sdk import WebClient
@@ -26,13 +27,21 @@ CHANNEL_ID = os.environ.get('CHANNEL_ID')
 CALENDAR_ID = os.environ.get('CALENDAR_ID')
 
 def get_todays_event():
-    today = datetime.utcnow().date()
+    # Set timezone to New Zealand
+    nz_tz = pytz.timezone('Pacific/Auckland')
+    
+    # Get current date in NZ time
+    today = datetime.now(nz_tz).date()
     tomorrow = today + timedelta(days=1)
+    
+    # Convert to UTC for Google Calendar API
+    today_start = datetime.combine(today, datetime.min.time()).replace(tzinfo=nz_tz).astimezone(pytz.UTC)
+    tomorrow_start = datetime.combine(tomorrow, datetime.min.time()).replace(tzinfo=nz_tz).astimezone(pytz.UTC)
     
     events_result = calendar_service.events().list(
         calendarId=CALENDAR_ID,
-        timeMin=today.isoformat() + 'T00:00:00Z',
-        timeMax=tomorrow.isoformat() + 'T00:00:00Z',
+        timeMin=today_start.isoformat(),
+        timeMax=tomorrow_start.isoformat(),
         singleEvents=True,
         orderBy='startTime'
     ).execute()
