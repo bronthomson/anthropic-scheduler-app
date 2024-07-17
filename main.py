@@ -86,12 +86,12 @@ def send_message_to_slack(message):
 
 def main():
     event = get_todays_event()
-    print(f"Today's event: {event}")
+    print(f"Today is: {event}")
     if event:
         print(f"Searching for: '{event}'")
         data = get_data_from_sheets(event)
         if data:
-            send_message_to_slack(f"Today's event: {data[0]}\nAssociated information: {data[1]}")
+            send_message_to_slack(f"Today's event: {data[0]}\n {data[1]}")
         else:
             send_message_to_slack(f"Sorry, I couldn't find any data related to today's event: '{event}'.")
     else:
