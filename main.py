@@ -23,7 +23,7 @@ slack_client = WebClient(token=slack_token)
 
 SHEET_ID = os.environ.get('SHEET_ID')
 CHANNEL_ID = os.environ.get('CHANNEL_ID')
-CALENDAR_ID = os.environ.get('CALENDAR_ID')  # Add this to your Heroku config vars
+CALENDAR_ID = os.environ.get('CALENDAR_ID')
 
 def get_todays_event():
     today = datetime.utcnow().date()
